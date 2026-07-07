@@ -235,8 +235,7 @@ def get_puzzle_answer() -> list:
 
 if __name__ == "__main__":
     import os
+    import uvicorn
     port = int(os.environ.get("PORT", 8000))
-    os.environ.setdefault("FASTMCP_PORT", str(port))
-    os.environ.setdefault("FASTMCP_HOST", "0.0.0.0")
-    transport = "sse" if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PORT") else "stdio"
-    mcp.run(transport=transport)
+    app = mcp.sse_app()
+    uvicorn.run(app, host="0.0.0.0", port=port)
