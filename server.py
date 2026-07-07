@@ -236,6 +236,16 @@ def get_puzzle_answer() -> list:
 if __name__ == "__main__":
     import os
     import uvicorn
+    from starlette.applications import Starlette
+    from starlette.middleware import Middleware
+    from starlette.middleware.trustedhost import TrustedHostMiddleware
+    from starlette.routing import Mount
+
     port = int(os.environ.get("PORT", 8000))
-    app = mcp.sse_app()
+    sse = mcp.sse_app()
+
+    app = Starlette(
+        routes=[Mount("/", app=sse)],
+        middleware=[Middleware(TrustedHostMiddleware, allowed_hosts=["*"])],
+    )
     uvicorn.run(app, host="0.0.0.0", port=port)
