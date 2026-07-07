@@ -14,7 +14,12 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("가로세로퍼즐")
+import os as _os
+mcp = FastMCP(
+    "가로세로퍼즐",
+    host="0.0.0.0",
+    port=int(_os.environ.get("PORT", 8000)),
+)
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
 
@@ -234,18 +239,4 @@ def get_puzzle_answer() -> list:
 
 
 if __name__ == "__main__":
-    import os
-    import uvicorn
-    from starlette.applications import Starlette
-    from starlette.middleware import Middleware
-    from starlette.middleware.trustedhost import TrustedHostMiddleware
-    from starlette.routing import Mount
-
-    port = int(os.environ.get("PORT", 8000))
-    sse = mcp.sse_app()
-
-    app = Starlette(
-        routes=[Mount("/", app=sse)],
-        middleware=[Middleware(TrustedHostMiddleware, allowed_hosts=["*"])],
-    )
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    mcp.run(transport="sse")
