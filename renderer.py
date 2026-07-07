@@ -19,7 +19,7 @@ def _get_font(size: int, bold: bool = False):
     """시스템 한글 폰트 자동 탐색"""
     # 프로젝트 내 번들 폰트 우선
     _here = os.path.dirname(os.path.abspath(__file__))
-    bundled = os.path.join(_here, "fonts", "NotoSansKR-Regular.ttf")
+    bundled = os.path.join(_here, "fonts", "NotoSansKR.ttf")
     candidates = [bundled]
 
     sys = platform.system()
