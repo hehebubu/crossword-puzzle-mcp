@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 가로세로퍼즐 MCP 서버
-"가세퍼" 또는 "가로세로퍼즐" 입력 시 오늘의 퍼즐 이미지를 반환
+Korean Crossword Puzzle MCP Server
 """
 
 import base64
@@ -19,6 +19,7 @@ mcp = FastMCP(
     "가로세로퍼즐",
     host="0.0.0.0",
     port=int(_os.environ.get("PORT", 8000)),
+    stateless_http=True,
 )
 
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "output")
@@ -178,14 +179,23 @@ def _img_to_base64(path: str) -> str:
         return base64.b64encode(f.read()).decode()
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations={
+        "title": "Today's Korean Crossword Puzzle",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "openWorldHint": False,
+        "idempotentHint": True,
+    }
+)
 def get_today_puzzle(must_word: str = "") -> list:
     """
-    오늘의 가로세로퍼즐을 생성합니다.
-    '가세퍼' 또는 '가로세로퍼즐' 입력 시 호출하세요.
+    Generate today's Korean crossword puzzle (가로세로퍼즐).
+    Call this when the user says '가세퍼', '가로세로퍼즐', or asks for today's puzzle.
+    Returns the puzzle image and clue text for Threads caption.
 
     Args:
-        must_word: 반드시 포함할 단어 (선택사항). 예: '대한민국'
+        must_word: A Korean word that must appear in the puzzle (optional). e.g. '대한민국'
     """
     target = date.today()
     date_str = target.strftime("%Y-%m-%d")
@@ -209,11 +219,19 @@ def get_today_puzzle(must_word: str = "") -> list:
     ]
 
 
-@mcp.tool()
+@mcp.tool(
+    annotations={
+        "title": "Today's Crossword Answer",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "openWorldHint": False,
+        "idempotentHint": True,
+    }
+)
 def get_puzzle_answer() -> list:
     """
-    오늘 가로세로퍼즐의 정답 이미지를 반환합니다.
-    '정답 보여줘' 입력 시 호출하세요.
+    Return the answer image for today's Korean crossword puzzle (가로세로퍼즐).
+    Call this when the user says '정답', '정답 보여줘', or asks to reveal the answer.
     """
     target = date.today()
     date_str = target.strftime("%Y-%m-%d")
@@ -239,4 +257,4 @@ def get_puzzle_answer() -> list:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="sse")
+    mcp.run(transport="streamable-http")
