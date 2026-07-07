@@ -12,7 +12,9 @@ from datetime import date
 # 프로젝트 루트를 경로에 추가
 sys.path.insert(0, os.path.dirname(__file__))
 
-from mcp.server.fastmcp import FastMCP, Image
+from mcp.server.fastmcp import FastMCP
+
+BASE_URL = _os.environ.get("BASE_URL", "http://localhost:8000")
 
 import os as _os
 mcp = FastMCP(
@@ -204,10 +206,8 @@ def get_today_puzzle(must_word: str = "") -> list:
     puzzle_path, answer_path, merged = _generate_puzzle(target, must_word=mw)
     caption = _make_caption(merged, date_str)
 
-    return [
-        Image(data=open(puzzle_path, "rb").read(), format="png"),
-        caption,
-    ]
+    puzzle_url = f"{BASE_URL}/images/crossword_{date_str}.png"
+    return f"![가로세로퍼즐]({puzzle_url})\n\n{caption}"
 
 
 @mcp.tool(
@@ -232,11 +232,23 @@ def get_puzzle_answer() -> list:
     if not os.path.exists(answer_path):
         _, answer_path, _ = _generate_puzzle(target)
 
-    return [
-        Image(data=open(answer_path, "rb").read(), format="png"),
-        f"{date_str} 정답입니다!",
-    ]
+    answer_url = f"{BASE_URL}/images/crossword_{date_str}_answer.png"
+    return f"![정답]({answer_url})\n\n{date_str} 정답입니다!"
 
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    import uvicorn
+    from starlette.applications import Starlette
+    from starlette.routing import Mount
+    from starlette.staticfiles import StaticFiles
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+    mcp_app = mcp.streamable_http_app()
+    app = Starlette(routes=[
+        Mount("/images", app=StaticFiles(directory=OUTPUT_DIR), name="images"),
+        Mount("/", app=mcp_app),
+    ])
+
+    port = int(_os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
