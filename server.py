@@ -208,7 +208,7 @@ def get_today_puzzle(must_word: str = "") -> list:
     caption = _make_caption(merged, date_str)
 
     puzzle_url = f"{BASE_URL}/images/crossword_{date_str}.png"
-    return f"![가로세로퍼즐]({puzzle_url})\n\n{caption}"
+    return f"🧩 오늘의 가로세로퍼즐\n퍼즐 이미지: {puzzle_url}\n\n{caption}"
 
 
 @mcp.tool(
@@ -234,7 +234,7 @@ def get_puzzle_answer() -> list:
         _, answer_path, _ = _generate_puzzle(target)
 
     answer_url = f"{BASE_URL}/images/crossword_{date_str}_answer.png"
-    return f"![정답]({answer_url})\n\n{date_str} 정답입니다!"
+    return f"✅ {date_str} 정답\n정답 이미지: {answer_url}"
 
 
 if __name__ == "__main__":
