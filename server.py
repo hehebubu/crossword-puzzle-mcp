@@ -239,17 +239,12 @@ def get_puzzle_answer() -> list:
 
 if __name__ == "__main__":
     import uvicorn
-    from starlette.applications import Starlette
-    from starlette.routing import Mount
     from starlette.staticfiles import StaticFiles
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
     mcp_app = mcp.streamable_http_app()
-    app = Starlette(routes=[
-        Mount("/images", app=StaticFiles(directory=OUTPUT_DIR), name="images"),
-        Mount("/", app=mcp_app),
-    ])
+    mcp_app.mount("/images", StaticFiles(directory=OUTPUT_DIR), name="images")
 
     port = int(_os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(mcp_app, host="0.0.0.0", port=port)
