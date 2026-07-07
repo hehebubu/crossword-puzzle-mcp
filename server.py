@@ -12,7 +12,7 @@ from datetime import date
 # 프로젝트 루트를 경로에 추가
 sys.path.insert(0, os.path.dirname(__file__))
 
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP, Image
 
 import os as _os
 mcp = FastMCP(
@@ -204,18 +204,9 @@ def get_today_puzzle(must_word: str = "") -> list:
     puzzle_path, answer_path, merged = _generate_puzzle(target, must_word=mw)
     caption = _make_caption(merged, date_str)
 
-    puzzle_b64 = _img_to_base64(puzzle_path)
-
     return [
-        {
-            "type": "image",
-            "data": puzzle_b64,
-            "mimeType": "image/png",
-        },
-        {
-            "type": "text",
-            "text": caption,
-        },
+        Image(data=open(puzzle_path, "rb").read(), format="png"),
+        caption,
     ]
 
 
@@ -241,18 +232,9 @@ def get_puzzle_answer() -> list:
     if not os.path.exists(answer_path):
         _, answer_path, _ = _generate_puzzle(target)
 
-    answer_b64 = _img_to_base64(answer_path)
-
     return [
-        {
-            "type": "image",
-            "data": answer_b64,
-            "mimeType": "image/png",
-        },
-        {
-            "type": "text",
-            "text": f"📋 {date_str} 정답입니다!",
-        },
+        Image(data=open(answer_path, "rb").read(), format="png"),
+        f"{date_str} 정답입니다!",
     ]
 
 
