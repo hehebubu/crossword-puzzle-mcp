@@ -235,10 +235,8 @@ def get_puzzle_answer() -> list:
 
 if __name__ == "__main__":
     import os
-    # Railway 등 배포 환경에선 HTTP/SSE, 로컬에선 stdio
-    transport = "sse" if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PORT") else "stdio"
     port = int(os.environ.get("PORT", 8000))
-    if transport == "sse":
-        mcp.run(transport="sse", host="0.0.0.0", port=port)
-    else:
-        mcp.run()
+    os.environ.setdefault("FASTMCP_PORT", str(port))
+    os.environ.setdefault("FASTMCP_HOST", "0.0.0.0")
+    transport = "sse" if os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("PORT") else "stdio"
+    mcp.run(transport=transport)
