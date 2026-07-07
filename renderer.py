@@ -17,23 +17,25 @@ ACCENT  = (50, 100, 200)
 
 def _get_font(size: int, bold: bool = False):
     """시스템 한글 폰트 자동 탐색"""
-    candidates = []
+    # 프로젝트 내 번들 폰트 우선
+    _here = os.path.dirname(os.path.abspath(__file__))
+    bundled = os.path.join(_here, "fonts", "NotoSansKR-Regular.ttf")
+    candidates = [bundled]
+
     sys = platform.system()
     if sys == "Darwin":
-        candidates = [
+        candidates += [
             "/System/Library/Fonts/AppleSDGothicNeo.ttc",
             "/Library/Fonts/NanumGothic.ttf",
-            "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
         ]
     elif sys == "Linux":
-        candidates = [
+        candidates += [
             "/usr/share/fonts/truetype/nanum/NanumGothic.ttf",
             "/usr/share/fonts/truetype/unfonts-core/UnDotum.ttf",
         ]
     elif sys == "Windows":
-        candidates = [
+        candidates += [
             "C:/Windows/Fonts/malgun.ttf",
-            "C:/Windows/Fonts/gulim.ttc",
         ]
     for path in candidates:
         if os.path.exists(path):
