@@ -14,9 +14,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 from mcp.server.fastmcp import FastMCP
 
-BASE_URL = _os.environ.get("BASE_URL", "http://localhost:8000")
-
 import os as _os
+
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8000")
+
 mcp = FastMCP(
     "가로세로퍼즐",
     host="0.0.0.0",
